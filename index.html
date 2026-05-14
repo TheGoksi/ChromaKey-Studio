@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VFX Studio | Cinematic Chroma Key</title>
     <style>
-        /* Moderný profesionálny dark-theme */
         :root {
             --bg-main: #09090b;
             --bg-panel: #18181b;
@@ -29,7 +28,6 @@
             align-items: center;
         }
 
-        /* 1. Povinné tlačidlo "Späť" podľa zadania */
         .header-bar {
             width: 100%;
             max-width: 1200px;
@@ -56,7 +54,6 @@
             border-color: var(--text-muted);
         }
 
-        /* Hlavný layout štúdia */
         .studio-container {
             display: grid;
             grid-template-columns: 350px 1fr;
@@ -65,7 +62,6 @@
             width: 100%;
         }
 
-        /* Ľavý panel: Ovládanie */
         .control-panel {
             background-color: var(--bg-panel);
             padding: 25px;
@@ -86,10 +82,9 @@
         }
         .panel-section:last-child { border-bottom: none; padding-bottom: 0; }
         
-        h2 { font-size: 1.1rem; margin: 0; color: var(--text-main); font-weight: 600; letter-spacing: 0.5px; }
+        h2 { font-size: 1.1rem; margin: 0; color: var(--text-main); font-weight: 600; }
         p.subtitle { margin: -5px 0 10px 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
 
-        /* Tlačidlá */
         .btn {
             background-color: var(--bg-input);
             color: var(--text-main);
@@ -107,14 +102,11 @@
             gap: 8px;
         }
         .btn:hover { border-color: var(--accent); background-color: rgba(16, 185, 129, 0.1); color: var(--accent); }
-        .btn.primary { background-color: var(--accent); color: #000; border: none; font-weight: 700; }
-        .btn.primary:hover { background-color: var(--accent-hover); }
         .btn.danger { border-color: var(--danger); color: var(--danger); }
         .btn.danger:hover { background-color: var(--danger); color: white; }
         .btn.danger.recording { animation: pulse 1.5s infinite; background-color: var(--danger); color: white;}
         input[type="file"] { display: none; }
 
-        /* Slidery a Selecty */
         label { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 5px; }
         select {
             width: 100%;
@@ -147,7 +139,6 @@
         }
         input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
 
-        /* Pravý panel: Canvas / Náhľad */
         .preview-panel {
             display: flex;
             flex-direction: column;
@@ -169,8 +160,11 @@
             max-width: 100%;
             height: auto;
             display: block;
-            cursor: crosshair;
+            cursor: grab;
             transition: filter 0.3s ease;
+        }
+        canvas:active {
+            cursor: grabbing;
         }
         .canvas-hint {
             position: absolute;
@@ -184,6 +178,7 @@
             font-size: 0.8rem;
             backdrop-filter: blur(4px);
             pointer-events: none;
+            text-align: center;
         }
 
         @keyframes pulse {
@@ -192,10 +187,9 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* Responzivita */
         @media (max-width: 900px) {
             .studio-container { grid-template-columns: 1fr; }
-            .preview-panel { order: -1; } /* Náhľad bude na mobile hore */
+            .preview-panel { order: -1; } 
         }
     </style>
 </head>
@@ -211,7 +205,6 @@
     <div class="studio-container">
         
         <div class="control-panel">
-            
             <div class="panel-section">
                 <h2>1. Zdroj obrazu (Popredie)</h2>
                 <p class="subtitle">Nahraj súbor so zeleným plátnom alebo zapni live kameru.</p>
@@ -235,12 +228,10 @@
 
             <div class="panel-section">
                 <h2>3. VFX & Color Grading</h2>
-                
                 <div>
                     <label for="tolerance"><span>Tolerancia kľúčovania</span> <span id="tolValue">100</span></label>
                     <input type="range" id="tolerance" min="0" max="255" value="100">
                 </div>
-
                 <div style="margin-top: 15px;">
                     <label for="cinematicFilter">Filmový filter (Post-process)</label>
                     <select id="cinematicFilter">
@@ -261,13 +252,14 @@
                 </div>
                 <button class="btn" id="resetBtn" style="border-color: var(--border);">🔄 Resetovať štúdio</button>
             </div>
-
         </div>
 
         <div class="preview-panel">
             <div class="canvas-wrapper">
                 <canvas id="canvas" width="1280" height="720" style="background: #000;"></canvas>
-                <div class="canvas-hint" id="canvasHint">Kliknutím na obraz zmeníš farbu, ktorá sa má vymazať</div>
+                <div class="canvas-hint" id="canvasHint">
+                    🖱️ <b>Klik:</b> Výber farby | 🤚 <b>Ťahanie:</b> Posun objektu | ⚙️ <b>Koliesko:</b> Veľkosť
+                </div>
             </div>
         </div>
 
@@ -282,7 +274,7 @@
         let fgVideo = document.createElement('video');
         fgVideo.muted = true;
         fgVideo.loop = true;
-        fgVideo.setAttribute('playsinline', ''); // Pre mobily
+        fgVideo.setAttribute('playsinline', ''); 
 
         let fgLoaded = false;
         let bgLoaded = false;
@@ -291,10 +283,14 @@
         let animationFrameId;
         let currentStream = null;
 
-        // Default farba kľúčovania (Zelená)
         let targetColor = { r: 0, g: 255, b: 0 }; 
+
+        // --- PREMENNÉ PRE POHYB A ZMENU VEĽKOSTI ---
+        let fgState = { x: 0, y: 0, scale: 1 };
+        let isDragging = false;
+        let lastMouse = { x: 0, y: 0 };
+        let dragDistance = 0;
         
-        // Elementy
         const toleranceSlider = document.getElementById('tolerance');
         const tolValue = document.getElementById('tolValue');
         const cinematicFilter = document.getElementById('cinematicFilter');
@@ -304,12 +300,10 @@
         const webcamBtn = document.getElementById('webcamBtn');
         const canvasHint = document.getElementById('canvasHint');
 
-        // Premenné pre nahrávanie videa
         let mediaRecorder;
         let recordedChunks = [];
         let isRecording = false;
 
-        // Pomocná funkcia na zastavenie zdrojov
         function stopMediaSources() {
             if(animationFrameId) cancelAnimationFrame(animationFrameId);
             fgVideo.pause();
@@ -321,13 +315,76 @@
             }
         }
 
-        // 1. Nahrať popredie (Súbor)
+        // --- VYKRESLENIE POZADIA (COVER) ---
+        function drawBackground(context, img) {
+            const sw = img.videoWidth || img.width;
+            const sh = img.videoHeight || img.height;
+            if (!sw || !sh) return;
+
+            const sourceRatio = sw / sh;
+            const canvasRatio = canvas.width / canvas.height;
+            let drawW, drawH, drawX, drawY;
+
+            if (sourceRatio > canvasRatio) {
+                drawH = canvas.height;
+                drawW = canvas.height * sourceRatio;
+                drawX = (canvas.width - drawW) / 2;
+                drawY = 0;
+            } else {
+                drawW = canvas.width;
+                drawH = canvas.width / sourceRatio;
+                drawX = 0;
+                drawY = (canvas.height - drawH) / 2;
+            }
+            context.drawImage(img, drawX, drawY, drawW, drawH);
+        }
+
+        // --- VYKRESLENIE OBJEKTU S POSUNOM A LUPOM ---
+        function drawForeground(context, source) {
+            const sw = source.videoWidth || source.width;
+            const sh = source.videoHeight || source.height;
+            if (!sw || !sh) return;
+            
+            const sourceRatio = sw / sh;
+            const canvasRatio = canvas.width / canvas.height;
+            let drawW, drawH;
+            
+            // Základná veľkosť (Contain)
+            if (sourceRatio > canvasRatio) {
+                drawW = canvas.width;
+                drawH = canvas.width / sourceRatio;
+            } else {
+                drawH = canvas.height;
+                drawW = canvas.height * sourceRatio;
+            }
+
+            // Aplikovanie Zoomu (Scale)
+            const finalW = drawW * fgState.scale;
+            const finalH = drawH * fgState.scale;
+            
+            // Základné vycentrovanie
+            const baseX = (canvas.width - finalW) / 2;
+            const baseY = (canvas.height - finalH) / 2;
+
+            if (isWebcamMode) {
+                context.save();
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+                // Pri zrkadlovom obraze musíme posun X invertovať, aby myš ťahala správnym smerom
+                context.drawImage(source, baseX - fgState.x, baseY + fgState.y, finalW, finalH);
+                context.restore();
+            } else {
+                context.drawImage(source, baseX + fgState.x, baseY + fgState.y, finalW, finalH);
+            }
+        }
+
         document.getElementById('fgUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             
             stopMediaSources();
             isWebcamMode = false;
+            fgState = { x: 0, y: 0, scale: 1 }; // Reset pozície pri novom súbore
             webcamBtn.style.borderColor = "var(--border)";
             webcamBtn.style.color = "var(--text-main)";
             
@@ -337,8 +394,6 @@
                 isVideoMode = true;
                 fgVideo.src = fileURL;
                 fgVideo.onloadeddata = () => {
-                    canvas.width = fgVideo.videoWidth;
-                    canvas.height = fgVideo.videoHeight;
                     fgLoaded = true;
                     fgVideo.play();
                     renderVideoLoop();
@@ -346,8 +401,6 @@
             } else {
                 isVideoMode = false;
                 fgImage.onload = () => {
-                    canvas.width = fgImage.width;
-                    canvas.height = fgImage.height;
                     fgLoaded = true;
                     processFrame(fgImage);
                 }
@@ -355,23 +408,20 @@
             }
         });
 
-        // 2. Zapnúť Webkameru (Nová funkcia)
         webcamBtn.addEventListener('click', async function() {
             try {
                 stopMediaSources();
+                fgState = { x: 0, y: 0, scale: 1 };
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
                 currentStream = stream;
                 fgVideo.srcObject = stream;
                 isVideoMode = true;
                 isWebcamMode = true;
                 
-                // Zvýraznenie tlačidla, že je kamera aktívna
                 this.style.borderColor = "var(--accent)";
                 this.style.color = "var(--accent)";
 
                 fgVideo.onloadeddata = () => {
-                    canvas.width = fgVideo.videoWidth;
-                    canvas.height = fgVideo.videoHeight;
                     fgLoaded = true;
                     fgVideo.play();
                     renderVideoLoop();
@@ -382,7 +432,6 @@
             }
         });
 
-        // 3. Nahrať pozadie
         document.getElementById('bgUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -393,7 +442,6 @@
             bgImage.src = URL.createObjectURL(file);
         });
 
-        // Interakcie UX
         toleranceSlider.addEventListener('input', function() {
             tolValue.textContent = this.value;
             if (!isVideoMode && fgLoaded) processFrame(fgImage);
@@ -402,16 +450,59 @@
         cinematicFilter.addEventListener('change', function() {
             canvas.style.filter = this.value;
             if (!isVideoMode && fgLoaded) {
-                // Prekreslenie pre statický obrázok pri zmene filtra (aby to aplikovalo hneď)
                 ctx.filter = this.value;
                 processFrame(fgImage);
                 ctx.filter = 'none';
             }
         });
 
-        // Kvapátko (Výber farby kliknutím)
+        // --- MYŠOVÉ EVENTY (ŤAHANIE, LUPA, KVAPÁTKO) ---
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastMouse = { x: e.clientX, y: e.clientY };
+            dragDistance = 0;
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging || !fgLoaded) return;
+            
+            const dx = e.clientX - lastMouse.x;
+            const dy = e.clientY - lastMouse.y;
+            dragDistance += Math.abs(dx) + Math.abs(dy); // Sledujeme či išlo o klik alebo posun
+            
+            // Prepočítanie posunu myši na skutočné pixely canvasu
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            fgState.x += dx * scaleX;
+            fgState.y += dy * scaleY;
+            lastMouse = { x: e.clientX, y: e.clientY };
+            
+            if (!isVideoMode) processFrame(fgImage);
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+            if (!fgLoaded) return;
+            e.preventDefault(); // Zabráni scrollovaniu stránky
+            
+            const zoomSpeed = 0.002;
+            const zoomAmount = -e.deltaY * zoomSpeed;
+            // Obmedzenie lupy (od 10% po 500% veľkosti)
+            fgState.scale = Math.max(0.1, Math.min(5, fgState.scale + zoomAmount));
+            
+            if (!isVideoMode) processFrame(fgImage);
+        }, { passive: false });
+
         canvas.addEventListener('click', function(e) {
             if (!fgLoaded) return;
+            // Ak sme myšou potiahli viac ako 5px, ignorujeme klik (išlo o ťahanie)
+            if (dragDistance > 5) return; 
+
             const rect = canvas.getBoundingClientRect();
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
@@ -419,53 +510,47 @@
             const y = (e.clientY - rect.top) * scaleY;
 
             let source = isVideoMode ? fgVideo : fgImage;
-            // Vykreslíme surový frame na zistenie farby
-            ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+            
+            // Nakreslíme len objekt presne tak, ako je zväčšený a posunutý
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawForeground(ctx, source);
+            
             const pixel = ctx.getImageData(x, y, 1, 1).data;
             targetColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
             
-            // UI Hint zmizne po prvom kliknutí
-            canvasHint.style.opacity = '0';
+            canvasHint.style.opacity = '0'; // Skryjeme nápovedu po prvom úspešnom kliku
             
             if(!isVideoMode) processFrame(fgImage);
         });
 
-        // Jadro: Video Slučka
         function renderVideoLoop() {
             if (!isVideoMode) return;
             processFrame(fgVideo);
             animationFrameId = requestAnimationFrame(renderVideoLoop);
         }
 
-        // Jadro: Spracovanie Snímky (Chroma Key + Spill Suppression)
+        // --- HLAVNÝ PROCESS RENDERU ---
         function processFrame(source) {
             if (!fgLoaded) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // 1. Kreslenie pozadia
             if (bgLoaded) {
-                ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+                drawBackground(ctx, bgImage);
             }
 
-            // 2. Príprava objektu
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
             const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
             
-            // Ak je to webkamera, obraz zrkadlovo otočíme pre lepší pocit
-            if (isWebcamMode) {
-                tempCtx.translate(canvas.width, 0);
-                tempCtx.scale(-1, 1);
-            }
-            tempCtx.drawImage(source, 0, 0, canvas.width, canvas.height);
+            // Nakreslíme objekt do pomocného plátna (so všetkými transformáciami)
+            drawForeground(tempCtx, source);
             
             const frame = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
             const data = frame.data;
             const tolerance = parseInt(toleranceSlider.value);
 
-            // 3. Algoritmus
             for (let i = 0; i < data.length; i += 4) {
                 let r = data[i];
                 let g = data[i + 1];
@@ -478,9 +563,8 @@
                 );
 
                 if (diff < tolerance) {
-                    data[i + 3] = 0; // Úplne priehľadné
+                    data[i + 3] = 0; 
                 } else if (diff < tolerance + 40) {
-                    // Soft edge (vyhladenie a potlačenie zelenej farby na okrajoch)
                     let alpha = ((diff - tolerance) / 40) * 255;
                     data[i + 3] = alpha;
                 }
@@ -488,13 +572,11 @@
 
             tempCtx.putImageData(frame, 0, 0);
             
-            // 4. Finálny render s filtrom
             ctx.filter = canvas.style.filter || 'none';
             ctx.drawImage(tempCanvas, 0, 0);
             ctx.filter = 'none';
         }
 
-        // Export funkcií
         downloadBtn.addEventListener('click', function() {
             if(!fgLoaded) return alert("Najskôr nahraj zdroj obrazu.");
             const link = document.createElement('a');
@@ -540,6 +622,7 @@
         resetBtn.addEventListener('click', function() {
             stopMediaSources();
             fgLoaded = false; bgLoaded = false; isVideoMode = false; isWebcamMode = false;
+            fgState = { x: 0, y: 0, scale: 1 };
             document.getElementById('fgUpload').value = '';
             document.getElementById('bgUpload').value = '';
             ctx.clearRect(0, 0, canvas.width, canvas.height);
