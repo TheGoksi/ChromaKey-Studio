@@ -38,11 +38,3 @@ Tento projekt slúži ako plne funkčné, klientske (client-side) vizuálne št�
    * Pre záznam videa klikni na `🔴 Nahrávať video`, nechaj scénu chvíľu bežať a potom klikni na `⏹️ Zastaviť a stiahnuť`.
 
 ---
-
-## ⚙️ Technické pozadie
-
-Aplikácia je postavená výlučne na moderných webových štandardoch:
-* **HTML5 & Vanilla JavaScript:** Žiadne externé knižnice ani frameworky.
-* **Canvas API:** Real-time analýza pixelov a výpočet euklidovskej vzdialenosti farieb (RGB kanály a manipulácia s Alpha kanálom).
-* **MediaStream Recording API:** Zachytávanie dynamického canvasu a kódovanie videa priamo na grafickej karte používateľa.
-* **CSS Filters:** Hardvérovo akcelerovaný post-processing obrazu.
