@@ -1,63 +1,50 @@
-# ChromaKey-Studio
-# Multimediálna Webová Služba - Portal
+# 🎬 VFX Chroma Key & Color Grading Studio
 
-Toto je hlavný portál pre predmet, ktorý agreguje a zobrazuje všetky študentské zadania. Portál beží ako jednoduchá aplikácia v **Python Flask**.
+> **Interaktívna webová aplikácia pre real-time odstránenie zeleného plátna, spájanie obrazu a filmový post-processing.**
 
-## 🚀 Ako spustiť portál?
+Tento projekt slúži ako plne funkčné, klientske (client-side) vizuálne štúdio bežiace priamo vo webovom prehliadači. Bez potreby akéhokoľvek backendu dokáže v reálnom čase spracovávať fotografie a bežiace video, aplikovať na ne efekty a následne ich vyexportovať. Je navrhnutý tak, aby priniesol okamžitý vizuálny "WOW efekt" s dôrazom na kinematografickú estetiku.
 
-1. Uisti sa, že máš nainštalovaný Python a `flask`:
-   ```bash
-   pip install flask
-V hlavnom priečinku portálu:
+---
 
-Bash
-python app.py
-Otvor si prehliadač na adrese http://127.0.0.1:5000.
-📚 Inštrukcie pre Študentov (Ako pridať projekt)
-Každý študent si vybral tému (AUDIO, OBRAZ, VIDEO, TEXT, 3D MODEL). Vašou úlohou je vyvinúť Multimediálnu webovú službu (napr. v Pythone, Jave, alebo čisto v HTML/JS).
+## ✨ Kľúčové funkcie (Features)
 
-Aby bol váš projekt správne zaindexovaný a zobrazený na hlavnom portáli, musíte dodržať nasledujúce konvencie!
+* 🟢 **Real-time Chroma Keying:** Odstránenie zeleného (alebo iného) plátna nielen zo statických fotiek, ale aj z bežiaceho videa pomocou HTML5 Canvas.
+* 🎯 **Smart Color Picker:** Možnosť vybrať si kľúčovaciu farbu jednoduchým kliknutím priamo na plátno (podpora pre Green Screen, Blue Screen a ďalšie).
+* 🎛️ **Soft-Edge Tolerancia:** Precízny posuvník na nastavenie tolerancie s algoritmom na vyhladzovanie hrán (spill suppression), aby objekty nevyzerali umelo vystrihnuté.
+* 🎨 **Filmový Color Grading:** Okamžitá aplikácia vizuálnych filtrov, ktoré zjednotia nasvietenie scény:
+  * *Akčný Thriller* (Vysoký kontrast a saturácia)
+  * *Neo-Noir* (Drsný čiernobiely vizuál)
+  * *Sci-Fi / Matrix* (Ikonický zelený nádych)
+  * *Post-Apo* (Temné, vyblednuté tóny)
+* 💾 **Natívny Export:** Možnosť jedným kliknutím stiahnuť aktuálnu snímku (`.png`) alebo nahrať a vyexportovať upravené video (`.webm`) pomocou natívneho MediaRecorder API.
 
-1. Štruktúra priečinka
-Váš projekt musí byť nakopírovaný do adresára Projects/ pod názvom, ktorý reprezentuje vašu tému alebo meno. Názov priečinka sa automaticky stane názvom projektu na portáli (napr. priečinok Moj_Audio_Projekt sa zobrazí ako Moj Audio Projekt).
+---
 
-Váš priečinok MUSÍ obsahovať:
+## 🚀 Ako spustiť projekt
 
-thumbnail.png – obrázok s presným rozlíšením 1000 x 1000 pixelov (pomer strán 1:1). Iné veľkosti nie sú povolené. Toto je náhľad, ktorý sa ukáže na karte portálu.
+Keďže aplikácia spĺňa prísne obmedzenia a nevyžaduje **žiadny bežiaci backend** (žiadny Flask, Node.js ani Java), jej spustenie je maximálne jednoduché:
 
-index.html – hlavný frontend rozhranie vášho zadania (toto uvidí užívateľ po rozkliknutí karty na webe).
+1. Stiahni si tento repozitár (alebo použi `git clone`).
+2. Otvor súbor `index.html` v akomkoľvek modernom webovom prehliadači (Chrome, Edge, Firefox, Safari).
+3. Aplikácia je okamžite pripravená na použitie.
 
-⚠️ Dôležité: Váš index.html musí obsahovať tlačidlo "Späť" (odkaz <a href="/">Späť</a> ), aby sa hodnotiteľ vedel po vyskúšaní zadania jedným klikom vrátiť na hlavný portál!
+---
 
-Odovzdávanie a Nasadenie (GitHub Workflow)
-Aby sme vedeli spravovať všetkých 80+ projektov v tomto jednom portáli, odovzdávanie prebieha výlučne cez Git/GitHub:
+## 🛠️ Návod na použitie
 
-Projekt nahráš na svoj GitHub (public repozitár).
+1. **Nahraj objekt (Video/Obraz):** Klikni na prvé tlačidlo a nahraj svoj zdrojový súbor s jednofarebným pozadím (odporúča sa zelené plátno). *Podporované sú obrázky aj .mp4 videá.*
+2. **Nahraj nové prostredie:** Klikni na druhé tlačidlo a nahraj obrázok pozadia (napr. filmovú scénu, pódium alebo abstraktný priestor), do ktorého chceš objekt zasadiť.
+3. **Doladenie kľúčovania:** Posúvaj slider "Tolerancia", kým pôvodné pozadie úplne nezmizne. Ak má tvoj objekt iné ako zelené pozadie, **klikni myšou priamo na video/obrázok** na farbu, ktorú chceš vymazať.
+4. **Color Grading:** Vyber si z rolovacieho menu filmový filter, ktorý najlepšie prepojí atmosféru objektu s novým pozadím.
+5. **Export:** * Pre obrázok klikni na `💾 Snímka`.
+   * Pre záznam videa klikni na `🔴 Nahrávať video`, nechaj scénu chvíľu bežať a potom klikni na `⏹️ Zastaviť a stiahnuť`.
 
-Odkaz na tvoj GitHub repozitár vložíš do učiteľovej centrálnej hodnotiacej tabuľky. Učiteľ si následne cez príkaz git clone stiahne tvoj projekt, kde ti ho jedným klikom priamo zo spoločného servera vyskúša.
+---
 
-2. Rozhranie (Frontend & Backend)
-Frontend (index.html):
+## ⚙️ Technické pozadie
 
-Portál používa statické servovanie frontendov z Projects. Keď užívateľ klikne na vašu kartu, portál vráti tento index.html.
-
-Uistite sa, že do index.html vkladáte CSS a JS cez relatívne cesty (napr. <script src="script.js"></script>, alebo priamo cez inline tagy).
-
-Vaša stránka musí jasne vysvetliť, ako sa má používať! Napríklad, pridať tlačidlo pre "Upload súboru".
-
-Vylúčenie Backendu (Strictne Frontend):
-
-Vaše zadanie NESMIE závisieť od akéhokoľvek vonkajšieho bežiaceho serverového backendu (žiadny Python Flask, Java Spring, Node.js Express ap.), či už lokálne ale aj na internetových službách - pretože vaše servery by po rokoch zmizli.
-
-Portál a aj projekty tak musia plne fungovať a vykonávať logiku výlučne vo webovom prehliadači užívateľa na báze statických súborov.
-
-Ak robíte zadanie a chcete použiť Python, použite technológiu ako PyScript (beží Python v prehliadači) resp. WebAssembly. Ostatné procesy kód'te pomocou moderných webových rozhraní prehliadačov (HTML5 Canvas, Web Audio API, Three.js WebGL atď.).
-
-Jedine toto zabezpečí, že po vložení priečinka so zadaním to učiteľovi okamžite aspoň o 5 rokov bezchybne pobeží bez riešenia padnutých alebo vypnutých serverov.
-
-3. Vstup a Výstup (In/Out)
-Každé zadanie musí spĺňať podobnú in/out štruktúru:
-
-INPUT: Rozhranie umožňuje užívateľovi nahrať multimediálny súbor (audio, video, obraz...) alebo parametre pre 3D/textový generátor prostredníctvom webového formulára alebo Drag & Drop UI.
-
-OUTPUT: Výsledok spracovania sa musí vizualizovať/prehrať priamo na vašej stránke. Nevraciate iba čisté dáta do konzoly!
+Aplikácia je postavená výlučne na moderných webových štandardoch:
+* **HTML5 & Vanilla JavaScript:** Žiadne externé knižnice ani frameworky.
+* **Canvas API:** Real-time analýza pixelov a výpočet euklidovskej vzdialenosti farieb (RGB kanály a manipulácia s Alpha kanálom).
+* **MediaStream Recording API:** Zachytávanie dynamického canvasu a kódovanie videa priamo na grafickej karte používateľa.
+* **CSS Filters:** Hardvérovo akcelerovaný post-processing obrazu.
