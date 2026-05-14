@@ -22,8 +22,6 @@ Tento projekt slúži ako plne funkčné, klientske (client-side) vizuálne št�
 
 ## 🚀 Ako spustiť projekt
 
-Keďže aplikácia spĺňa prísne obmedzenia a nevyžaduje **žiadny bežiaci backend** (žiadny Flask, Node.js ani Java), jej spustenie je maximálne jednoduché:
-
 1. Stiahni si tento repozitár (alebo použi `git clone`).
 2. Otvor súbor `index.html` v akomkoľvek modernom webovom prehliadači (Chrome, Edge, Firefox, Safari).
 3. Aplikácia je okamžite pripravená na použitie.
