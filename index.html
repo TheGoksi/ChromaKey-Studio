@@ -3,138 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web-based Chroma Key & VFX Studio</title>
+    <title>VFX Studio | Cinematic Chroma Key</title>
     <style>
+        /* Moderný profesionálny dark-theme */
         :root {
-            --primary: #00ff88;
-            --bg: #0f0f11;
-            --panel: #1a1a1d;
-            --text: #e0e0e0;
+            --bg-main: #09090b;
+            --bg-panel: #18181b;
+            --bg-input: #27272a;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --border: #3f3f46;
+            --danger: #ef4444;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
+        /* 1. Povinné tlačidlo "Späť" podľa zadania */
+        .header-bar {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
         .back-button {
-            align-self: flex-start;
-            background-color: #333;
-            color: white;
+            background-color: var(--bg-panel);
+            color: var(--text-main);
             text-decoration: none;
             padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-        .back-button:hover { background-color: #555; }
-        .container {
-            background-color: var(--panel);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            max-width: 1000px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 { margin-top: 0; color: var(--primary); letter-spacing: 1px; }
-        .controls, .fx-controls {
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
             align-items: center;
+            gap: 8px;
         }
-        .upload-btn, .action-btn {
-            background: #2c2c2c;
-            border: 2px dashed #555;
-            padding: 12px 18px;
+        .back-button:hover {
+            background-color: var(--bg-input);
+            border-color: var(--text-muted);
+        }
+
+        /* Hlavný layout štúdia */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* Ľavý panel: Ovládanie */
+        .control-panel {
+            background-color: var(--bg-panel);
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .panel-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .panel-section:last-child { border-bottom: none; padding-bottom: 0; }
+        
+        h2 { font-size: 1.1rem; margin: 0; color: var(--text-main); font-weight: 600; letter-spacing: 0.5px; }
+        p.subtitle { margin: -5px 0 10px 0; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* Tlačidlá */
+        .btn {
+            background-color: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 0.9rem;
             font-weight: 500;
+            transition: all 0.2s;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .upload-btn:hover { border-color: var(--primary); }
-        .action-btn { border: 2px solid var(--primary); color: var(--primary); font-weight: bold; background: transparent; }
-        .action-btn:hover { background: var(--primary); color: #000; }
-        
-        /* Špecifické farby pre nové tlačidlá */
-        #recordBtn { border-color: #ff4444; color: #ff4444; }
-        #recordBtn:hover { background: #ff4444; color: white; }
-        #recordBtn.recording { background: #ff4444; color: white; animation: pulse 1.5s infinite; }
-        
-        #resetBtn { border-color: #ffaa00; color: #ffaa00; }
-        #resetBtn:hover { background: #ffaa00; color: #000; }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
-        }
-
+        .btn:hover { border-color: var(--accent); background-color: rgba(16, 185, 129, 0.1); color: var(--accent); }
+        .btn.primary { background-color: var(--accent); color: #000; border: none; font-weight: 700; }
+        .btn.primary:hover { background-color: var(--accent-hover); }
+        .btn.danger { border-color: var(--danger); color: var(--danger); }
+        .btn.danger:hover { background-color: var(--danger); color: white; }
+        .btn.danger.recording { animation: pulse 1.5s infinite; background-color: var(--danger); color: white;}
         input[type="file"] { display: none; }
+
+        /* Slidery a Selecty */
+        label { font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 5px; }
         select {
-            padding: 10px;
-            background: #2c2c2c;
-            color: white;
-            border: 1px solid #555;
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+        }
+        select:focus { border-color: var(--accent); }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--bg-main);
             border-radius: 5px;
             outline: none;
         }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        /* Pravý panel: Canvas / Náhľad */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .canvas-wrapper {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
         canvas {
             max-width: 100%;
-            border-radius: 10px;
-            background: #000;
-            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.1);
+            height: auto;
+            display: block;
             cursor: crosshair;
             transition: filter 0.3s ease;
+        }
+        .canvas-hint {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Responzivita */
+        @media (max-width: 900px) {
+            .studio-container { grid-template-columns: 1fr; }
+            .preview-panel { order: -1; } /* Náhľad bude na mobile hore */
         }
     </style>
 </head>
 <body>
 
-    <a href="/" class="back-button">Späť</a>
+    <div class="header-bar">
+        <a href="/" class="back-button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Späť na portál
+        </a>
+    </div>
 
-    <div class="container">
-        <h1>VFX Chroma Key & Color Grading Studio</h1>
-        <p>Vystrihni pozadie z videa, aplikuj filter a vyexportuj hotový klip.</p>
+    <div class="studio-container">
         
-        <div class="controls">
-            <label class="upload-btn">
-                🎥 Nahrať objekt (Obraz/Video)
-                <input type="file" id="fgUpload" accept="image/*,video/*">
-            </label>
-            <label class="upload-btn">
-                🖼️ Nahrať nové pozadie (Obraz)
-                <input type="file" id="bgUpload" accept="image/*">
-            </label>
-            <button class="action-btn" id="resetBtn">🔄 Reset scény</button>
+        <div class="control-panel">
+            
+            <div class="panel-section">
+                <h2>1. Zdroj obrazu (Popredie)</h2>
+                <p class="subtitle">Nahraj súbor so zeleným plátnom alebo zapni live kameru.</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label class="btn">
+                        🎥 Súbor
+                        <input type="file" id="fgUpload" accept="image/*,video/*">
+                    </label>
+                    <button class="btn" id="webcamBtn">📷 Webkamera</button>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2>2. Prostredie (Pozadie)</h2>
+                <p class="subtitle">Vlož filmové prostredie alebo scenériu.</p>
+                <label class="btn">
+                    🖼️ Nahrať obrázok pozadia
+                    <input type="file" id="bgUpload" accept="image/*">
+                </label>
+            </div>
+
+            <div class="panel-section">
+                <h2>3. VFX & Color Grading</h2>
+                
+                <div>
+                    <label for="tolerance"><span>Tolerancia kľúčovania</span> <span id="tolValue">100</span></label>
+                    <input type="range" id="tolerance" min="0" max="255" value="100">
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label for="cinematicFilter">Filmový filter (Post-process)</label>
+                    <select id="cinematicFilter">
+                        <option value="none">Bez filtra (Natural)</option>
+                        <option value="contrast(1.2) saturate(1.3)">Akčný Thriller</option>
+                        <option value="grayscale(100%) contrast(1.5)">Neo-Noir (Čiernobiele)</option>
+                        <option value="sepia(0.8) hue-rotate(90deg) saturate(1.5)">Sci-Fi / Matrix</option>
+                        <option value="brightness(0.8) sepia(0.3) saturate(0.8)">Post-Apo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2>4. Export</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <button class="btn" id="downloadBtn">💾 Snímka (.png)</button>
+                    <button class="btn danger" id="recordBtn">🔴 Video (.webm)</button>
+                </div>
+                <button class="btn" id="resetBtn" style="border-color: var(--border);">🔄 Resetovať štúdio</button>
+            </div>
+
         </div>
 
-        <div class="fx-controls">
-            <label>Tolerancia (<span id="tolValue">100</span>): 
-                <input type="range" id="tolerance" min="0" max="255" value="100">
-            </label>
-            <label>Filter: 
-                <select id="cinematicFilter">
-                    <option value="none">Bez filtra (Natural)</option>
-                    <option value="contrast(1.2) saturate(1.3)">Akčný Thriller</option>
-                    <option value="grayscale(100%) contrast(1.5)">Neo-Noir</option>
-                    <option value="sepia(0.8) hue-rotate(90deg) saturate(1.5)">Sci-Fi / Matrix</option>
-                    <option value="brightness(0.8) sepia(0.3) saturate(0.8)">Post-Apo</option>
-                </select>
-            </label>
-            <button class="action-btn" id="downloadBtn">💾 Snímka</button>
-            <button class="action-btn" id="recordBtn">🔴 Nahrávať video</button>
+        <div class="preview-panel">
+            <div class="canvas-wrapper">
+                <canvas id="canvas" width="1280" height="720" style="background: #000;"></canvas>
+                <div class="canvas-hint" id="canvasHint">Kliknutím na obraz zmeníš farbu, ktorá sa má vymazať</div>
+            </div>
         </div>
 
-        <canvas id="canvas" width="800" height="450"></canvas>
     </div>
 
     <script>
@@ -146,12 +282,16 @@
         let fgVideo = document.createElement('video');
         fgVideo.muted = true;
         fgVideo.loop = true;
+        fgVideo.setAttribute('playsinline', ''); // Pre mobily
 
         let fgLoaded = false;
         let bgLoaded = false;
         let isVideoMode = false;
+        let isWebcamMode = false;
         let animationFrameId;
+        let currentStream = null;
 
+        // Default farba kľúčovania (Zelená)
         let targetColor = { r: 0, g: 255, b: 0 }; 
         
         // Elementy
@@ -161,16 +301,36 @@
         const downloadBtn = document.getElementById('downloadBtn');
         const recordBtn = document.getElementById('recordBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const webcamBtn = document.getElementById('webcamBtn');
+        const canvasHint = document.getElementById('canvasHint');
 
         // Premenné pre nahrávanie videa
         let mediaRecorder;
         let recordedChunks = [];
         let isRecording = false;
 
-        // Nahrávanie popredia
+        // Pomocná funkcia na zastavenie zdrojov
+        function stopMediaSources() {
+            if(animationFrameId) cancelAnimationFrame(animationFrameId);
+            fgVideo.pause();
+            fgVideo.removeAttribute('src');
+            fgVideo.load();
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+        }
+
+        // 1. Nahrať popredie (Súbor)
         document.getElementById('fgUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
+            
+            stopMediaSources();
+            isWebcamMode = false;
+            webcamBtn.style.borderColor = "var(--border)";
+            webcamBtn.style.color = "var(--text-main)";
+            
             const fileURL = URL.createObjectURL(file);
 
             if (file.type.startsWith('video/')) {
@@ -185,7 +345,6 @@
                 };
             } else {
                 isVideoMode = false;
-                if(animationFrameId) cancelAnimationFrame(animationFrameId);
                 fgImage.onload = () => {
                     canvas.width = fgImage.width;
                     canvas.height = fgImage.height;
@@ -196,7 +355,34 @@
             }
         });
 
-        // Nahrávanie pozadia
+        // 2. Zapnúť Webkameru (Nová funkcia)
+        webcamBtn.addEventListener('click', async function() {
+            try {
+                stopMediaSources();
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+                currentStream = stream;
+                fgVideo.srcObject = stream;
+                isVideoMode = true;
+                isWebcamMode = true;
+                
+                // Zvýraznenie tlačidla, že je kamera aktívna
+                this.style.borderColor = "var(--accent)";
+                this.style.color = "var(--accent)";
+
+                fgVideo.onloadeddata = () => {
+                    canvas.width = fgVideo.videoWidth;
+                    canvas.height = fgVideo.videoHeight;
+                    fgLoaded = true;
+                    fgVideo.play();
+                    renderVideoLoop();
+                };
+            } catch (err) {
+                alert("Nepodarilo sa spustiť webkameru. Skontroluj povolenia prehliadača.");
+                console.error(err);
+            }
+        });
+
+        // 3. Nahrať pozadie
         document.getElementById('bgUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -207,7 +393,7 @@
             bgImage.src = URL.createObjectURL(file);
         });
 
-        // Event Listenery pre interakciu
+        // Interakcie UX
         toleranceSlider.addEventListener('input', function() {
             tolValue.textContent = this.value;
             if (!isVideoMode && fgLoaded) processFrame(fgImage);
@@ -215,8 +401,15 @@
 
         cinematicFilter.addEventListener('change', function() {
             canvas.style.filter = this.value;
+            if (!isVideoMode && fgLoaded) {
+                // Prekreslenie pre statický obrázok pri zmene filtra (aby to aplikovalo hneď)
+                ctx.filter = this.value;
+                processFrame(fgImage);
+                ctx.filter = 'none';
+            }
         });
 
+        // Kvapátko (Výber farby kliknutím)
         canvas.addEventListener('click', function(e) {
             if (!fgLoaded) return;
             const rect = canvas.getBoundingClientRect();
@@ -226,38 +419,53 @@
             const y = (e.clientY - rect.top) * scaleY;
 
             let source = isVideoMode ? fgVideo : fgImage;
+            // Vykreslíme surový frame na zistenie farby
             ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
             const pixel = ctx.getImageData(x, y, 1, 1).data;
             targetColor = { r: pixel[0], g: pixel[1], b: pixel[2] };
             
+            // UI Hint zmizne po prvom kliknutí
+            canvasHint.style.opacity = '0';
+            
             if(!isVideoMode) processFrame(fgImage);
         });
 
-        // Jadro renderingu
+        // Jadro: Video Slučka
         function renderVideoLoop() {
             if (!isVideoMode) return;
             processFrame(fgVideo);
             animationFrameId = requestAnimationFrame(renderVideoLoop);
         }
 
+        // Jadro: Spracovanie Snímky (Chroma Key + Spill Suppression)
         function processFrame(source) {
             if (!fgLoaded) return;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 1. Kreslenie pozadia
             if (bgLoaded) {
                 ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
             }
 
+            // 2. Príprava objektu
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
             const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
             
+            // Ak je to webkamera, obraz zrkadlovo otočíme pre lepší pocit
+            if (isWebcamMode) {
+                tempCtx.translate(canvas.width, 0);
+                tempCtx.scale(-1, 1);
+            }
             tempCtx.drawImage(source, 0, 0, canvas.width, canvas.height);
+            
             const frame = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
             const data = frame.data;
             const tolerance = parseInt(toleranceSlider.value);
 
+            // 3. Algoritmus
             for (let i = 0; i < data.length; i += 4) {
                 let r = data[i];
                 let g = data[i + 1];
@@ -270,62 +478,36 @@
                 );
 
                 if (diff < tolerance) {
-                    data[i + 3] = 0; 
-                } else if (diff < tolerance + 30) {
-                    data[i + 3] = ((diff - tolerance) / 30) * 255;
+                    data[i + 3] = 0; // Úplne priehľadné
+                } else if (diff < tolerance + 40) {
+                    // Soft edge (vyhladenie a potlačenie zelenej farby na okrajoch)
+                    let alpha = ((diff - tolerance) / 40) * 255;
+                    data[i + 3] = alpha;
                 }
             }
 
             tempCtx.putImageData(frame, 0, 0);
             
-            // Kreslenie s aplikovaním CSS filtra priamo na kontext (dôležité pre video export)
+            // 4. Finálny render s filtrom
             ctx.filter = canvas.style.filter || 'none';
             ctx.drawImage(tempCanvas, 0, 0);
-            ctx.filter = 'none'; // reset pre ďalší frame
+            ctx.filter = 'none';
         }
 
-        // --- NOVÉ FUNKCIE ---
-
-        // 1. Resetovanie scény
-        resetBtn.addEventListener('click', function() {
-            fgLoaded = false;
-            bgLoaded = false;
-            isVideoMode = false;
-            if(animationFrameId) cancelAnimationFrame(animationFrameId);
-            
-            fgVideo.pause();
-            fgVideo.removeAttribute('src');
-            fgVideo.load();
-            
-            document.getElementById('fgUpload').value = '';
-            document.getElementById('bgUpload').value = '';
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            canvas.style.filter = 'none';
-            cinematicFilter.value = 'none';
-            toleranceSlider.value = 100;
-            tolValue.textContent = '100';
-            targetColor = { r: 0, g: 255, b: 0 };
-            
-            if(isRecording) recordBtn.click(); // Ak nahráva, zastav to
-        });
-
-        // 2. Snímka (Screenshot)
+        // Export funkcií
         downloadBtn.addEventListener('click', function() {
-            if(!fgLoaded) return alert("Najskôr nahraj objekt.");
+            if(!fgLoaded) return alert("Najskôr nahraj zdroj obrazu.");
             const link = document.createElement('a');
             link.download = 'vfx_zaber.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });
 
-        // 3. Nahrávanie a export videa
         recordBtn.addEventListener('click', function() {
-            if(!fgLoaded) return alert("Najskôr nahraj video alebo obrázok na nahrávanie.");
+            if(!fgLoaded) return alert("Najskôr nahraj zdroj obrazu.");
             
             if (!isRecording) {
-                // Začiatok nahrávania
-                const stream = canvas.captureStream(30); // 30 FPS
+                const stream = canvas.captureStream(30);
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
                 recordedChunks = [];
                 
@@ -337,7 +519,7 @@
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
-                    link.download = 'vfx_zaber.webm';
+                    link.download = 'vfx_zaznam.webm';
                     link.href = url;
                     link.click();
                     URL.revokeObjectURL(url);
@@ -345,15 +527,31 @@
                 
                 mediaRecorder.start();
                 isRecording = true;
-                recordBtn.textContent = '⏹️ Zastaviť a stiahnuť';
+                recordBtn.innerHTML = '⏹️ Zastaviť a stiahnuť';
                 recordBtn.classList.add('recording');
             } else {
-                // Koniec nahrávania
                 mediaRecorder.stop();
                 isRecording = false;
-                recordBtn.textContent = '🔴 Nahrávať video';
+                recordBtn.innerHTML = '🔴 Video (.webm)';
                 recordBtn.classList.remove('recording');
             }
+        });
+
+        resetBtn.addEventListener('click', function() {
+            stopMediaSources();
+            fgLoaded = false; bgLoaded = false; isVideoMode = false; isWebcamMode = false;
+            document.getElementById('fgUpload').value = '';
+            document.getElementById('bgUpload').value = '';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.filter = 'none';
+            cinematicFilter.value = 'none';
+            toleranceSlider.value = 100;
+            tolValue.textContent = '100';
+            targetColor = { r: 0, g: 255, b: 0 };
+            webcamBtn.style.borderColor = "var(--border)";
+            webcamBtn.style.color = "var(--text-main)";
+            canvasHint.style.opacity = '1';
+            if(isRecording) recordBtn.click();
         });
     </script>
 </body>
