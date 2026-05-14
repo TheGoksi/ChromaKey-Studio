@@ -2,7 +2,7 @@
 
 > **Interaktívna webová aplikácia pre real-time odstránenie zeleného plátna, spájanie obrazu a filmový post-processing.**
 
-Tento projekt slúži ako plne funkčné, klientske (client-side) vizuálne štúdio bežiace priamo vo webovom prehliadači. Bez potreby akéhokoľvek backendu dokáže v reálnom čase spracovávať fotografie a bežiace video, aplikovať na ne efekty a následne ich vyexportovať. Je navrhnutý tak, aby priniesol okamžitý vizuálny "WOW efekt" s dôrazom na kinematografickú estetiku.
+Tento projekt slúži ako plne funkčné, klientske (client-side) vizuálne štúdio bežiace priamo vo webovom prehliadači. Bez potreby akéhokoľvek backendu dokáže v reálnom čase spracovávať fotografie a bežiace video, aplikovať na ne efekty a následne ich vyexportovať.
 
 ---
 
